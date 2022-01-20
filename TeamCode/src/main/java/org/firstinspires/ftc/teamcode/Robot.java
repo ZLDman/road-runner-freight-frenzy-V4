@@ -48,6 +48,8 @@ public class Robot {
 
     public static double bucketLevelMultiplier = 0.6;
 
+    int level = 3;
+
     public ColorSensor sensorColor1;
     public DistanceSensor sensorDistance1;
 
@@ -190,8 +192,9 @@ public class Robot {
                     extendClock = System.currentTimeMillis();
                 }
 
-                if(System.currentTimeMillis() - extendClock > 300) {
-                    setLiftPosition(0.04);
+                if(System.currentTimeMillis() - extendClock > 150) {
+                    bucket.setPosition();
+                    setLiftPosition(0);
                 }
 
                 if(!extend.isBusy()){
@@ -203,12 +206,25 @@ public class Robot {
             }
             //extend + lift bucket
             case EXTEND:{
+                if (level == 1)
+                {
+                    extend.setTargetPosition(2200);
+                    setLiftPosition(0.22);
+                }
+                else if (level == 2)
+                {
+                    extend.setTargetPosition(2100);
+                    setLiftPosition(0.47);
+                }
+                else
+                {
+                    extend.setTargetPosition(2800);
+                    setLiftPosition(0.73);
+                }
 
-                extend.setTargetPosition(2800);
                 extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 extend.setPower(0.75);
 
-                setLiftPosition(0.73);
                 extendClock = System.currentTimeMillis();
                 extendState = ExtendState.DUMP;
 
@@ -219,7 +235,19 @@ public class Robot {
                 bucket.setPosition(liftPosition * bucketLevelMultiplier);
 
                 if(System.currentTimeMillis() - extendClock > 500 && !extend.isBusy()) {
-                    bucket.setPosition(0.93);
+                    if (level == 1)
+                    {
+                        bucket.setPosition(0.6);
+                    }
+                    else if (level == 2)
+                    {
+                        bucket.setPosition(0.75);
+                    }
+                    else
+                    {
+                        bucket.setPosition(0.93);
+                    }
+
                     extendClock = System.currentTimeMillis();
                     extendState = ExtendState.WAIT;
                 }
@@ -228,12 +256,16 @@ public class Robot {
             }
             case WAIT:{
                 //wait 1/2 second to give the bucket time to dump then reset
-                if(System.currentTimeMillis() - extendClock > 300) {
+                if(System.currentTimeMillis() - extendClock > 750) {
                     extendClock = System.currentTimeMillis();
                     extendState = ExtendState.RESET;
                 }
             }
         }
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public void setIntake1Speed(double i) {

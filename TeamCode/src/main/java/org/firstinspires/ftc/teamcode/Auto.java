@@ -7,6 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.openCV.SkystoneDeterminationExample;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -17,21 +22,65 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @Autonomous()
 public class Auto extends LinearOpMode {
+    OpenCvInternalCamera phoneCam;
+    SkystoneDeterminationExample.SkystoneDeterminationPipeline pipeline;
+
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
-        double bucketPos = 0.08;
-        double liftPos = 0.93;
-        double intakePos = 0.45;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        pipeline = new SkystoneDeterminationExample.SkystoneDeterminationPipeline();
+        phoneCam.setPipeline(pipeline);
 
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
+        // out when the RC activity is in portrait. We do our actual image processing assuming
+        // landscape orientation, though.
+        phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.MAXIMIZE_EFFICIENCY);
+        phoneCam.showFpsMeterOnViewport(false);
 
-        waitForStart();
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                phoneCam.startStreaming(320,240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+            }
 
-        while (!isStopRequested()) {
+            @Override
+            public void onError(int errorCode)
+            {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+            }
+        });
 
+        while (!isStarted())
+        {
+            telemetry.addData("Analysis", pipeline.getAnalysis());
+            telemetry.update();
+
+            // Don't burn CPU cycles busy-looping in this sample
+            sleep(50);
         }
+
+        if (opModeIsActive()) {
+            int level = pipeline.getAnalysis().ordinal() + 1;
+
+            robot.setLevel(level);
+
+            telemetry.addData("Location", level);
+
+            robot.extendState = Robot.ExtendState.EXTEND;
+
+            while (opModeIsActive()) {
+                robot.updateExtend();
+                robot.updateLiftServo();
+            }
+        }
+
     }
 }
