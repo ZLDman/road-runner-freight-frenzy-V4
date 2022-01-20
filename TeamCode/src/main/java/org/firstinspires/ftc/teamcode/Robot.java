@@ -37,7 +37,7 @@ public class Robot {
     public Servo taperotateservo;
     public CRServo tapeextendservo;
 
-    public double tapelift = 0.9;
+    public double tapelift = 0.33;
     public double taperotate = 1;
     public double liftPosition = 0.4;
 
@@ -47,6 +47,7 @@ public class Robot {
     public DigitalChannel extendStop;
 
     public static double bucketLevelMultiplier = 0.6;
+    public static double bucketOffset = 0.1;
 
     int level = 3;
 
@@ -167,8 +168,8 @@ public class Robot {
 
     public void updateExtend() throws InterruptedException {
 
-        if(extendState != ExtendState.DUMP && extendState != ExtendState.WAIT) {
-            bucket.setPosition(liftPosition * bucketLevelMultiplier);
+        if(extendState != ExtendState.DUMP && extendState != ExtendState.WAIT && extendState != ExtendState.RESET) {
+            bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset);
         }
 
         switch (extendState){
@@ -193,7 +194,7 @@ public class Robot {
                 }
 
                 if(System.currentTimeMillis() - extendClock > 150) {
-                    bucket.setPosition();
+                    bucket.setPosition(0);
                     setLiftPosition(0);
                 }
 
@@ -232,20 +233,20 @@ public class Robot {
             }
             //dump
             case DUMP:{
-                bucket.setPosition(liftPosition * bucketLevelMultiplier);
+                bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset);
 
                 if(System.currentTimeMillis() - extendClock > 500 && !extend.isBusy()) {
                     if (level == 1)
                     {
-                        bucket.setPosition(0.6);
+                        bucket.setPosition(0.6 + bucketOffset);
                     }
                     else if (level == 2)
                     {
-                        bucket.setPosition(0.75);
+                        bucket.setPosition(0.75 + bucketOffset);
                     }
                     else
                     {
-                        bucket.setPosition(0.93);
+                        bucket.setPosition(0.93 + bucketOffset);
                     }
 
                     extendClock = System.currentTimeMillis();

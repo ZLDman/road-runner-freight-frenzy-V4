@@ -78,8 +78,11 @@ public class DriverControled extends LinearOpMode {
             robot.updateIntake();
             robot.updateExtend();
 
-            robot.tapelift -= gamepad2.left_stick_y * 0.01;
+            robot.tapelift += gamepad2.left_stick_y * 0.01;
             robot.taperotate += gamepad2.right_stick_x * 0.01;
+
+            robot.tapelift = Math.max(0.2, robot.tapelift);
+            robot.tapelift = Math.min(0.432, robot.tapelift);
 
             robot.tapeextendservo.setPower(gamepad2.right_stick_y);
             robot.tapeliftservo.setPosition(robot.tapelift);

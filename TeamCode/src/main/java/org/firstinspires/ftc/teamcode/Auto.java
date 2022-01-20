@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -30,6 +32,8 @@ public class Auto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
+        drive.setPoseEstimate(new Pose2d(-42.5,-64,0));
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         pipeline = new SkystoneDeterminationExample.SkystoneDeterminationPipeline();
@@ -58,6 +62,18 @@ public class Auto extends LinearOpMode {
             }
         });
 
+        robot.encoderservo.setPosition(0.25);
+
+        Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
+                .splineTo(new Vector2d(-12, -64), 0)
+                .build();
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                .splineTo(new Vector2d(42, -64), 0)
+                .build();
+
+
+
+
         while (!isStarted())
         {
             telemetry.addData("Analysis", pipeline.getAnalysis());
@@ -76,7 +92,18 @@ public class Auto extends LinearOpMode {
 
             robot.extendState = Robot.ExtendState.EXTEND;
 
+            drive.followTrajectoryAsync(traj1);
+
+            while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
+                drive.update();
+                robot.updateExtend();
+                robot.updateLiftServo();
+            }
+
+            drive.followTrajectoryAsync(traj2);
+
             while (opModeIsActive()) {
+                drive.update();
                 robot.updateExtend();
                 robot.updateLiftServo();
             }
