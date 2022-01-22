@@ -64,11 +64,19 @@ public class Auto extends LinearOpMode {
 
         robot.encoderservo.setPosition(0.25);
 
+        //start to hub
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
                 .splineTo(new Vector2d(-12, -64), 0)
                 .build();
+
+        //hub to warehouse
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
                 .splineTo(new Vector2d(42, -64), 0)
+                .build();
+
+        //warehouse to hub
+        Trajectory traj3 = drive.trajectoryBuilder(traj2.end(),true)
+                .splineTo(new Vector2d(-12, -64), 0)
                 .build();
 
 
@@ -84,6 +92,7 @@ public class Auto extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
+
             int level = pipeline.getAnalysis().ordinal() + 1;
 
             robot.setLevel(level);
@@ -92,22 +101,62 @@ public class Auto extends LinearOpMode {
 
             robot.extendState = Robot.ExtendState.EXTEND;
 
-            drive.followTrajectoryAsync(traj1);
+            //intake down
+            robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
 
+            //drive to hub
+            drive.followTrajectoryAsync(traj1);
             while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
                 drive.update();
                 robot.updateExtend();
                 robot.updateLiftServo();
+                robot.updateIntakeBucket();
             }
 
-            drive.followTrajectoryAsync(traj2);
+            while(opModeIsActive()) {
 
-            while (opModeIsActive()) {
-                drive.update();
-                robot.updateExtend();
-                robot.updateLiftServo();
+                //put encoder servo down
+                robot.encoderservo.setPosition(0.25);
+
+                robot.setIntake1Speed(1);
+
+                //drive into warehouse
+                drive.followTrajectoryAsync(traj2);
+                while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
+                    drive.update();
+                    robot.updateExtend();
+                    robot.updateLiftServo();
+                    robot.updateIntakeBucket();robot.setIntake1Speed(1);
+                }
+
+                //turn off intake and raise intake bucket
+                robot.setIntake1Speed(0);
+                robot.setIntakeBucketState(Robot.IntakeBucket.UP);
+
+                //drive to hub
+                drive.followTrajectoryAsync(traj3);
+                while (drive.isBusy() && opModeIsActive()) {
+                    drive.update();
+                    robot.updateExtend();
+                    robot.updateLiftServo();
+                    robot.updateIntakeBucket();
+                    robot.setIntake1Speed(0);
+                }
+
+                //set target to high goal and extend
+                robot.setLevel(3);
+                robot.extendState = Robot.ExtendState.EXTEND;
+
+                //intake down
+                robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
+
+                //wait until we finished dumping
+                while (robot.extendState != Robot.ExtendState.RESET && opModeIsActive()) {
+                    robot.updateExtend();
+                    robot.updateLiftServo();
+                    robot.setIntake1Speed(0);
+                }
             }
         }
-
     }
 }

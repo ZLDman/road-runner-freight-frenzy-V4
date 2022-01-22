@@ -57,6 +57,10 @@ public class Robot {
     public ColorSensor sensorColor2;
     public DistanceSensor sensorDistance2;
 
+    public IntakeBucket getIntakeBucketState() {
+        return intakeBucketState;
+    }
+
     enum IntakeState {
         MANUAL,     //manual control
         INTAKE,     //spin intake
@@ -72,12 +76,25 @@ public class Robot {
         WAIT        //wait for dump
     }
 
+    enum IntakeBucket {
+        LEFT,       //left
+        UP,     //up
+        RIGHT,      //right
+    }
+
     public IntakeState intakeState = IntakeState.MANUAL;
     public ExtendState extendState = ExtendState.INIT;
+    public IntakeBucket intakeBucketState = IntakeBucket.UP;
+    public IntakeBucket intakeBucketlastState = IntakeBucket.UP;
 
     public long intakeClock = System.currentTimeMillis();
     public long extendClock = System.currentTimeMillis();
+    public long intakebucketClock = System.currentTimeMillis();
 
+    public int intake1Target = 0;
+    public int intake2Target = 0;
+
+    public boolean intake1IsVerticle = true;
 
     public Robot(HardwareMap hardwareMap) {
         extend = hardwareMap.get(DcMotor.class, "extend");
@@ -166,6 +183,29 @@ public class Robot {
         }
     }
 
+    public void setIntakeBucketState(IntakeBucket intakeBucketState) {
+        if(this.intakeBucketState != intakeBucketState) {
+
+            intakeBucketlastState = this.intakeBucketState;
+
+            this.intakeBucketState = intakeBucketState;
+
+            intakebucketClock = System.currentTimeMillis();
+        }
+    }
+
+    public void updateIntakeBucket(){
+        if(intakeBucketState == IntakeBucket.UP){
+            intake.setPosition(0.45);
+        }
+        else if(intakeBucketState == IntakeBucket.RIGHT){
+            intake.setPosition(0.10);
+        }
+        else if(intakeBucketState == IntakeBucket.LEFT) {
+            intake.setPosition(0.77);
+        }
+    }
+
     public void updateExtend() throws InterruptedException {
 
         if(extendState != ExtendState.DUMP && extendState != ExtendState.WAIT && extendState != ExtendState.RESET) {
@@ -189,11 +229,10 @@ public class Robot {
                 if(extend.getCurrentPosition() > 500){
                     extend.setTargetPosition(0);
                     extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    extend.setPower(0.75);
-                    extendClock = System.currentTimeMillis();
+                    extend.setPower(1);
                 }
 
-                if(System.currentTimeMillis() - extendClock > 150) {
+                if(extend.getCurrentPosition() < 1700){
                     bucket.setPosition(0);
                     setLiftPosition(0);
                 }
@@ -224,7 +263,7 @@ public class Robot {
                 }
 
                 extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                extend.setPower(0.75);
+                extend.setPower(1);
 
                 extendClock = System.currentTimeMillis();
                 extendState = ExtendState.DUMP;
@@ -270,8 +309,15 @@ public class Robot {
     }
 
     public void setIntake1Speed(double i) {
-        int intakePosition = (int) (intake1.getCurrentPosition() % 45);
 
+        //int intakePosition = (int) (intake1.getCurrentPosition() % 45);
+
+       // if(!intake1IsVerticle) {
+       //     intake1Target = intake1.getCurrentPosition() - intakePosition;
+        //    intake1IsVerticle = true;
+        //}
+
+        /*
         if(i == 0 && (intakePosition > 5 && intakePosition < 40)){
             if(intakePosition > 30){
                 intake1.setPower(0.2);
@@ -282,13 +328,32 @@ public class Robot {
             else {
                 intake1.setPower(0.3);
             }
+       */
+        if(System.currentTimeMillis() - intakebucketClock < 2000) {
+            if(intakeBucketState == IntakeBucket.RIGHT) {
+                i = -0.5;
+            }
+            if((intakeBucketState == IntakeBucket.UP && intakeBucketlastState == IntakeBucket.RIGHT)  || (intakeBucketState == IntakeBucket.LEFT && intakeBucketlastState == IntakeBucket.RIGHT)) {
+                i = 0.5;
+            }
+        }
+        intake1.setPower(i);
+
+         /*
+        if(i == 0){
+            intake1.setTargetPosition(intake1Target);
+            intake1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            intake1.setPower(1);
         }
         else {
+            intake1IsVerticle = false;
+            intake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             intake1.setPower(i);
-        }
+        }*/
     }
 
     public void setIntake2Speed(double i) {
+        /*
         int intakePosition = (int) (intake2.getCurrentPosition() % 45);
 
         if(i == 0 && (intakePosition > 5 && intakePosition < 40)){
@@ -304,7 +369,17 @@ public class Robot {
         }
         else {
             intake2.setPower(i);
+        }*/
+
+        if(System.currentTimeMillis() - intakebucketClock < 750) {
+            if(intakeBucketState == IntakeBucket.LEFT) {
+                i = -0.5;
+            }
+            if((intakeBucketState == IntakeBucket.UP && intakeBucketlastState == IntakeBucket.LEFT)  || (intakeBucketState == IntakeBucket.RIGHT && intakeBucketlastState == IntakeBucket.LEFT)) {
+                i = 0.5;
+            }
         }
+        intake2.setPower(i);
     }
 
     public void setLiftPosition(double p){

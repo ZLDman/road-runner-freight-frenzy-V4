@@ -29,6 +29,9 @@ public class DriverControled extends LinearOpMode {
 
         waitForStart();
 
+        //put encoder servo down
+        robot.encoderservo.setPosition(0);
+
         while (!isStopRequested()) {
             drive.setWeightedDrivePower(
                     new Pose2d(
@@ -47,16 +50,20 @@ public class DriverControled extends LinearOpMode {
                 robot.extendState = Robot.ExtendState.EXTEND;
             }
 
+
+            /* INTAKE BUCKET */
             if(gamepad2.dpad_up){
-                robot.intake.setPosition(0.45);
+                robot.setIntakeBucketState(Robot.IntakeBucket.UP);
             }
             else if(gamepad2.dpad_right){
-                robot.intake.setPosition(0.10);
+                robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
             }
             else if(gamepad2.dpad_left){
-                robot.intake.setPosition(0.77);
+                robot.setIntakeBucketState(Robot.IntakeBucket.LEFT);
             }
+            robot.updateIntakeBucket();
 
+            /* INTAKE */
             if(robot.intakeState == Robot.IntakeState.MANUAL){
                 if(gamepad2.right_bumper) {
                     robot.setIntake1Speed(-gamepad2.right_trigger);
@@ -73,6 +80,7 @@ public class DriverControled extends LinearOpMode {
                 }
             }
 
+            /* CAROUSEL */
             robot.setCarSpeed(gamepad1.right_trigger - gamepad1.left_trigger);
 
             robot.updateIntake();
@@ -88,7 +96,7 @@ public class DriverControled extends LinearOpMode {
             robot.tapeliftservo.setPosition(robot.tapelift);
             robot.taperotateservo.setPosition(robot.taperotate);
 
-            robot.encoderservo.setPosition(0.25);
+            //robot.encoderservo.setPosition(0.25);
 
             //robot.setExtendSpeed(gamepad2.left_stick_y);
 
@@ -188,8 +196,9 @@ public class DriverControled extends LinearOpMode {
 
             //motor encoders
             telemetry.addData("extend: ", robot.extend.getCurrentPosition());
-            telemetry.addData("intake1: ", robot.intake2.getCurrentPosition());
-            telemetry.addData("intake1: ", robot.intake2.getCurrentPosition() % 45);
+            telemetry.addData("intake1: ", robot.intake1.getCurrentPosition());
+            telemetry.addData("intake1: ", robot.intake1.getCurrentPosition() % 45);
+            telemetry.addData("intake1: ", robot.intake1.getTargetPosition());
             telemetry.addData("lift: ", liftPos);
             telemetry.addData("bucket: ", bucketPos);
             telemetry.addData("intake: ", intakePos);
