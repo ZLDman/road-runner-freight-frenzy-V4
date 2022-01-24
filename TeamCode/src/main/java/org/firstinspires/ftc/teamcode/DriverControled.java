@@ -199,8 +199,8 @@ public class DriverControled extends LinearOpMode {
             telemetry.addData("intake1: ", robot.intake1.getCurrentPosition());
             telemetry.addData("intake1: ", robot.intake1.getCurrentPosition() % 45);
             telemetry.addData("intake1: ", robot.intake1.getTargetPosition());
-            telemetry.addData("lift: ", liftPos);
-            telemetry.addData("bucket: ", bucketPos);
+            telemetry.addData("lift: ", robot.lift.getPosition());
+            telemetry.addData("bucket: ", robot.bucket.getPosition());
             telemetry.addData("intake: ", intakePos);
 
             telemetry.addData("tape rotate: ", robot.taperotateservo.getPosition());

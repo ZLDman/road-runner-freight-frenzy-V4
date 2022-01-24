@@ -47,7 +47,8 @@ public class Robot {
     public DigitalChannel extendStop;
 
     public static double bucketLevelMultiplier = 0.6;
-    public static double bucketOffset = 0.1;
+    public static double bucketOffset1 = 0.1;
+    public static double bucketOffset2 = 0.025;
 
     int level = 3;
 
@@ -207,11 +208,6 @@ public class Robot {
     }
 
     public void updateExtend() throws InterruptedException {
-
-        if(extendState != ExtendState.DUMP && extendState != ExtendState.WAIT && extendState != ExtendState.RESET) {
-            bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset);
-        }
-
         switch (extendState){
             //manual
             case MANUAL:{
@@ -246,6 +242,15 @@ public class Robot {
             }
             //extend + lift bucket
             case EXTEND:{
+
+                if(bucket.getPosition() > 0.4) {
+                    bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset2);
+                }
+                else{
+                    bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset1);
+                }
+
+
                 if (level == 1)
                 {
                     extend.setTargetPosition(2200);
@@ -272,20 +277,25 @@ public class Robot {
             }
             //dump
             case DUMP:{
-                bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset);
+                if(bucket.getPosition() > 0.2) {
+                    bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset2);
+                }
+                else{
+                    bucket.setPosition((liftPosition * bucketLevelMultiplier) + bucketOffset1);
+                }
 
                 if(System.currentTimeMillis() - extendClock > 500 && !extend.isBusy()) {
                     if (level == 1)
                     {
-                        bucket.setPosition(0.6 + bucketOffset);
+                        bucket.setPosition(0.6 + bucketOffset1);
                     }
                     else if (level == 2)
                     {
-                        bucket.setPosition(0.75 + bucketOffset);
+                        bucket.setPosition(0.75 + bucketOffset1);
                     }
                     else
                     {
-                        bucket.setPosition(0.93 + bucketOffset);
+                        bucket.setPosition(0.93 + bucketOffset1);
                     }
 
                     extendClock = System.currentTimeMillis();
