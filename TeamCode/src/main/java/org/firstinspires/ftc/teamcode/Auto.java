@@ -81,19 +81,22 @@ public class Auto extends LinearOpMode {
 
 
 
+        int level = pipeline.getAnalysis().ordinal() + 1;
 
-        while (!isStarted())
+        while (!isStarted() && opModeIsActive())
         {
+
             telemetry.addData("Analysis", pipeline.getAnalysis());
             telemetry.update();
 
             // Don't burn CPU cycles busy-looping in this sample
             sleep(50);
+            level = pipeline.getAnalysis().ordinal() + 1;
         }
 
-        if (opModeIsActive()) {
+        phoneCam.stopStreaming();
 
-            int level = pipeline.getAnalysis().ordinal() + 1;
+        if (opModeIsActive()) {
 
             robot.setLevel(level);
 

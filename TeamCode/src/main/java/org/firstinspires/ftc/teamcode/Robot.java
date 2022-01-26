@@ -34,15 +34,14 @@ public class Robot {
     public Servo encoderservo;
 
     public Servo tapeliftservo;
-    public Servo taperotateservo;
+    public CRServo taperotateservo;
     public CRServo tapeextendservo;
 
     public double tapelift = 0.33;
-    public double taperotate = 1;
     public double liftPosition = 0.4;
 
 
-    public static double carMaxSpeed = 0.75;
+    public static double carMaxSpeed = 0.43;
 
     public DigitalChannel extendStop;
 
@@ -111,7 +110,7 @@ public class Robot {
 
         tapeextendservo = hardwareMap.get(CRServo.class, "tapeextendservo");
         tapeliftservo = hardwareMap.get(Servo.class, "tapeliftservo");
-        taperotateservo = hardwareMap.get(Servo.class, "taperotateservo");
+        taperotateservo = hardwareMap.get(CRServo.class, "taperotateservo");
 
         extendStop = hardwareMap.get(DigitalChannel.class,"extendStop");
 
@@ -230,7 +229,7 @@ public class Robot {
 
                 if(extend.getCurrentPosition() < 1700){
                     bucket.setPosition(0);
-                    setLiftPosition(0);
+                    setLiftPosition(0.04);
                 }
 
                 if(!extend.isBusy()){
@@ -437,17 +436,19 @@ public class Robot {
     // get the color sensor values
     double getColor(int channel,int s) {
         if(s == 1) {
-            if (channel == -1) return sensorDistance1.getDistance(DistanceUnit.INCH);
-            if (channel == 1) return sensorColor1.red();
-            if (channel == 2) return sensorColor1.green();
-            if (channel == 3) return sensorColor1.blue();
-            return sensorColor1.alpha();
+            //if (channel == -1) return
+            return sensorDistance1.getDistance(DistanceUnit.INCH);
+            //if (channel == 1) return sensorColor1.red();
+            //if (channel == 2) return sensorColor1.green();
+            //if (channel == 3) return sensorColor1.blue();
+            //return sensorColor1.alpha();
         }
 
-        if (channel == -1) return sensorDistance2.getDistance(DistanceUnit.INCH);
-        if (channel == 1) return sensorColor2.red();
-        if (channel == 2) return sensorColor2.green();
-        if (channel == 3) return sensorColor2.blue();
-        return sensorColor2.alpha();
+        //if (channel == -1)
+        return sensorDistance2.getDistance(DistanceUnit.INCH);
+        //if (channel == 1) return sensorColor2.red();
+        //if (channel == 2) return sensorColor2.green();
+        //if (channel == 3) return sensorColor2.blue();
+        //return sensorColor2.alpha();
     }
 }

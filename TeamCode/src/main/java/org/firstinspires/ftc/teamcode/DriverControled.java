@@ -87,14 +87,19 @@ public class DriverControled extends LinearOpMode {
             robot.updateExtend();
 
             robot.tapelift += gamepad2.left_stick_y * 0.01;
-            robot.taperotate += gamepad2.right_stick_x * 0.01;
 
             robot.tapelift = Math.max(0.2, robot.tapelift);
             robot.tapelift = Math.min(0.432, robot.tapelift);
 
             robot.tapeextendservo.setPower(gamepad2.right_stick_y);
             robot.tapeliftservo.setPosition(robot.tapelift);
-            robot.taperotateservo.setPosition(robot.taperotate);
+
+            if(gamepad2.right_stick_x > 0) {
+                robot.taperotateservo.setPower(gamepad2.right_stick_x / 10);
+            }
+            else{
+                robot.taperotateservo.setPower(gamepad2.right_stick_x / 20);
+            }
 
             //robot.encoderservo.setPosition(0.25);
 
@@ -203,7 +208,6 @@ public class DriverControled extends LinearOpMode {
             telemetry.addData("bucket: ", robot.bucket.getPosition());
             telemetry.addData("intake: ", intakePos);
 
-            telemetry.addData("tape rotate: ", robot.taperotateservo.getPosition());
             telemetry.addData("tape lift: ", robot.tapeliftservo.getPosition());
             telemetry.addData("encoderServo: ", robot.encoderservo.getPosition());
 
@@ -212,17 +216,17 @@ public class DriverControled extends LinearOpMode {
 
 
             //color sensor
-            telemetry.addData("distance ", robot.getColor(-1,1));
-            telemetry.addData("alpha ", robot.getColor(0,1));
-            telemetry.addData("red ", robot.getColor(1,1));
-            telemetry.addData("green ", robot.getColor(2,1));
-            telemetry.addData("blue ", robot.getColor(3,1));
+            //telemetry.addData("distance ", robot.getColor(-1,1));
+            //telemetry.addData("alpha ", robot.getColor(0,1));
+            //telemetry.addData("red ", robot.getColor(1,1));
+            //telemetry.addData("green ", robot.getColor(2,1));
+            //telemetry.addData("blue ", robot.getColor(3,1));
 
-            telemetry.addData("distance ", robot.getColor(-1,2));
-            telemetry.addData("alpha ", robot.getColor(0,2));
-            telemetry.addData("red ", robot.getColor(1,2));
-            telemetry.addData("green ", robot.getColor(2,2));
-            telemetry.addData("blue ", robot.getColor(3,2));
+            //telemetry.addData("distance ", robot.getColor(-1,2));
+            //telemetry.addData("alpha ", robot.getColor(0,2));
+            //telemetry.addData("red ", robot.getColor(1,2));
+            //telemetry.addData("green ", robot.getColor(2,2));
+            //telemetry.addData("blue ", robot.getColor(3,2));
 
             telemetry.addData("time: ", System.currentTimeMillis() - robot.intakeClock);
             telemetry.addData("time: ", robot.intakeState);
