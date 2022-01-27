@@ -80,10 +80,7 @@ public class Auto extends LinearOpMode {
                 .build();
 
 
-
-        int level = pipeline.getAnalysis().ordinal() + 1;
-
-        while (!isStarted() && opModeIsActive())
+        while (!isStarted())
         {
 
             telemetry.addData("Analysis", pipeline.getAnalysis());
@@ -91,12 +88,15 @@ public class Auto extends LinearOpMode {
 
             // Don't burn CPU cycles busy-looping in this sample
             sleep(50);
-            level = pipeline.getAnalysis().ordinal() + 1;
         }
 
-        phoneCam.stopStreaming();
+
 
         if (opModeIsActive()) {
+
+            int level = pipeline.getAnalysis().ordinal() + 1;
+
+            //phoneCam.stopStreaming();
 
             robot.setLevel(level);
 
@@ -126,6 +126,7 @@ public class Auto extends LinearOpMode {
                 //drive into warehouse
                 drive.followTrajectoryAsync(traj2);
                 while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
+                    drive.setDrivePower(new Pose2d(0.2,0,0));
                     drive.update();
                     robot.updateExtend();
                     robot.updateLiftServo();
@@ -133,6 +134,8 @@ public class Auto extends LinearOpMode {
                 }
 
                 //turn off intake and raise intake bucket
+                robot.setIntake1Speed(-1);
+                sleep(100);
                 robot.setIntake1Speed(0);
                 robot.setIntakeBucketState(Robot.IntakeBucket.UP);
 

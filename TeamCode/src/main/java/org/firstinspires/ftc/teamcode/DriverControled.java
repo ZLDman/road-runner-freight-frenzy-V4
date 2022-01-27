@@ -25,6 +25,8 @@ public class DriverControled extends LinearOpMode {
         double liftPos = 0.93;
         double intakePos = 0.45;
 
+        boolean erik = false;
+
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
@@ -33,13 +35,37 @@ public class DriverControled extends LinearOpMode {
         robot.encoderservo.setPosition(0);
 
         while (!isStopRequested()) {
-            drive.setWeightedDrivePower(
-                    new Pose2d(
-                            gamepad1.left_stick_x / 1.5,
-                            -gamepad1.left_stick_y / 1.5,
-                            -gamepad1.right_stick_y / 2
-                    )
-            );
+
+            //Erik
+            if (gamepad1.x)
+            {
+                erik = true;
+            }
+
+            if (gamepad1.y)
+            {
+                erik = false;
+            }
+
+            if(erik) {
+                drive.setWeightedDrivePower(
+                        new Pose2d(
+                                gamepad1.left_stick_x / 1.5,
+                                -gamepad1.left_stick_y / 1.5,
+                                -gamepad1.right_stick_y / 2
+                        )
+                );
+            }
+            //Renee
+            else{
+                drive.setWeightedDrivePower(
+                        new Pose2d(
+                                -gamepad1.left_stick_y / 1.5,
+                                -gamepad1.left_stick_x / 1.5,
+                                -gamepad1.right_stick_x / 2
+                        )
+                );
+            }
 
 
             if(gamepad2.x){
