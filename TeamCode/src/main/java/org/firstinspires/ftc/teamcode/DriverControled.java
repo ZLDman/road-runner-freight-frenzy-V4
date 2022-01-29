@@ -109,13 +109,13 @@ public class DriverControled extends LinearOpMode {
             /* CAROUSEL */
             robot.setCarSpeed(gamepad1.right_trigger - gamepad1.left_trigger);
 
-            robot.updateIntake();
+            //robot.updateIntake();
             robot.updateExtend();
 
-            robot.tapelift += gamepad2.left_stick_y * 0.01;
+            robot.tapelift += -gamepad2.left_stick_y * 0.01;
 
-            robot.tapelift = Math.max(0.2, robot.tapelift);
-            robot.tapelift = Math.min(0.432, robot.tapelift);
+            robot.tapelift = Math.max(0.43, robot.tapelift);
+            robot.tapelift = Math.min(0.66, robot.tapelift);
 
             robot.tapeextendservo.setPower(gamepad2.right_stick_y);
             robot.tapeliftservo.setPosition(robot.tapelift);

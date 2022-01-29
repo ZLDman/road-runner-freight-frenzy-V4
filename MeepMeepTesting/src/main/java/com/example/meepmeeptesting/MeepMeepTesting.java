@@ -24,13 +24,15 @@ public class MeepMeepTesting {
                 // Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(12, -65, 0))
+                        drive.trajectorySequenceBuilder(new Pose2d(-42, -65, 0))
                                 .forward(30)
-                                .back(55)
-                                .forward(55)
-                                .back(55)
-                                .forward(55)
-                                .back(55)
+                                .waitSeconds(0.01)
+                                .forward(60)
+                                .back(60)
+                                .forward(60)
+                                .back(60)
+                                .forward(60)
+                                .back(60)
                                 .build()
                 )
                 .start();

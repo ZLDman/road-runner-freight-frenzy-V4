@@ -37,7 +37,7 @@ public class Robot {
     public CRServo taperotateservo;
     public CRServo tapeextendservo;
 
-    public double tapelift = 0.33;
+    public static double tapelift = 0.55;
     public double liftPosition = 0.4;
 
 
@@ -53,9 +53,6 @@ public class Robot {
 
     public ColorSensor sensorColor1;
     public DistanceSensor sensorDistance1;
-
-    public ColorSensor sensorColor2;
-    public DistanceSensor sensorDistance2;
 
     public IntakeBucket getIntakeBucketState() {
         return intakeBucketState;
@@ -126,12 +123,6 @@ public class Robot {
 
         // get a reference to the distance sensor that shares the same name.
         sensorDistance1 = hardwareMap.get(DistanceSensor .class, "color1");
-
-        // get a reference to the color sensor.
-        sensorColor2 = hardwareMap.get(ColorSensor .class, "color2");
-
-        // get a reference to the distance sensor that shares the same name.
-        sensorDistance2 = hardwareMap.get(DistanceSensor .class, "color2");
 
     }
 
@@ -435,20 +426,8 @@ public class Robot {
 
     // get the color sensor values
     double getColor(int channel,int s) {
-        if(s == 1) {
-            //if (channel == -1) return
-            return sensorDistance1.getDistance(DistanceUnit.INCH);
-            //if (channel == 1) return sensorColor1.red();
-            //if (channel == 2) return sensorColor1.green();
-            //if (channel == 3) return sensorColor1.blue();
-            //return sensorColor1.alpha();
-        }
 
-        //if (channel == -1)
-        return sensorDistance2.getDistance(DistanceUnit.INCH);
-        //if (channel == 1) return sensorColor2.red();
-        //if (channel == 2) return sensorColor2.green();
-        //if (channel == 3) return sensorColor2.blue();
-        //return sensorColor2.alpha();
+        return sensorDistance1.getDistance(DistanceUnit.INCH);
+
     }
 }
