@@ -32,6 +32,8 @@ public class Auto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
+        long autoTime = System.currentTimeMillis();
+
         drive.setPoseEstimate(new Pose2d(-42.5,-64,0));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -94,9 +96,11 @@ public class Auto extends LinearOpMode {
 
         if (opModeIsActive()) {
 
+            autoTime = System.currentTimeMillis();
+
             int level = pipeline.getAnalysis().ordinal() + 1;
 
-            //phoneCam.stopStreaming();
+            phoneCam.closeCameraDevice();
 
             robot.setLevel(level);
 
@@ -161,6 +165,10 @@ public class Auto extends LinearOpMode {
                     robot.updateExtend();
                     robot.updateLiftServo();
                     robot.setIntake1Speed(0);
+                }
+
+                if(System.currentTimeMillis() - autoTime < 9000){
+                    return;
                 }
             }
         }

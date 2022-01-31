@@ -51,7 +51,7 @@ public class DriverControled extends LinearOpMode {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 gamepad1.left_stick_x / 1.5,
-                                -gamepad1.left_stick_y / 1.5,
+                                (-gamepad1.left_stick_y / 1.5) + 0.1,
                                 -gamepad1.right_stick_y / 2
                         )
                 );
@@ -61,7 +61,7 @@ public class DriverControled extends LinearOpMode {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 -gamepad1.left_stick_y / 1.5,
-                                -gamepad1.left_stick_x / 1.5,
+                                (-gamepad1.left_stick_x / 1.5) + 0.1,
                                 -gamepad1.right_stick_x / 2
                         )
                 );
