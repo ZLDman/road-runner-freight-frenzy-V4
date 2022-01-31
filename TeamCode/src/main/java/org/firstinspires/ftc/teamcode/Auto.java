@@ -32,6 +32,9 @@ public class Auto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
+        //if we should strafe towards the wall
+        SampleMecanumDrive.wall = true;
+
         long autoTime = System.currentTimeMillis();
 
         drive.setPoseEstimate(new Pose2d(-42.5,-64,0));

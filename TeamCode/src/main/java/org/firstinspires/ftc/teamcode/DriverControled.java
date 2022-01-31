@@ -21,6 +21,9 @@ public class DriverControled extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
+        //if we should strafe towards the wall
+        SampleMecanumDrive.wall = false;
+
         double bucketPos = 0.08;
         double liftPos = 0.93;
         double intakePos = 0.45;
@@ -51,7 +54,7 @@ public class DriverControled extends LinearOpMode {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 gamepad1.left_stick_x / 1.5,
-                                (-gamepad1.left_stick_y / 1.5) + 0.1,
+                                -gamepad1.left_stick_y / 1.5,
                                 -gamepad1.right_stick_y / 2
                         )
                 );
@@ -61,7 +64,7 @@ public class DriverControled extends LinearOpMode {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 -gamepad1.left_stick_y / 1.5,
-                                (-gamepad1.left_stick_x / 1.5) + 0.1,
+                                -gamepad1.left_stick_x / 1.5,
                                 -gamepad1.right_stick_x / 2
                         )
                 );

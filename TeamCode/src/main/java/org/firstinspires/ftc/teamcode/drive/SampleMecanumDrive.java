@@ -63,6 +63,9 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
+    //If we should drive towards wall
+    public static boolean wall = false;
+
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
@@ -274,10 +277,18 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v + 0.1);
-        leftRear.setPower(v1 + -0.1);
-        rightRear.setPower(v2 + 0.1);
-        rightFront.setPower(v3 + -0.1);
+        if(wall) {
+            leftFront.setPower(v + 0.1);
+            leftRear.setPower(v1 + -0.1);
+            rightRear.setPower(v2 + 0.1);
+            rightFront.setPower(v3 + -0.1);
+        }
+        else{
+            leftFront.setPower(v);
+            leftRear.setPower(v1);
+            rightRear.setPower(v2);
+            rightFront.setPower(v3);
+        }
     }
 
     @Override
