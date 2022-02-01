@@ -64,6 +64,7 @@ public class DuckAuto extends LinearOpMode {
 
         //start to carousel
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
+                .lineTo(new Vector2d(-42.5, -54))
                 .lineTo(new Vector2d(-61.5, -54))
                 .build();
 
