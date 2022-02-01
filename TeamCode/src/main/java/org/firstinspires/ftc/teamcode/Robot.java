@@ -187,7 +187,12 @@ public class Robot {
 
     public void updateIntakeBucket(){
         if(intakeBucketState == IntakeBucket.UP){
-            intake.setPosition(0.45);
+            if(intakeBucketlastState == IntakeBucket.RIGHT){
+                intake.setPosition(0.5);
+            }
+            else if(intakeBucketlastState == IntakeBucket.LEFT) {
+                intake.setPosition(0.4);
+            }
         }
         else if(intakeBucketState == IntakeBucket.RIGHT){
             intake.setPosition(0.15);
@@ -329,7 +334,7 @@ public class Robot {
                 intake1.setPower(0.3);
             }
        */
-        if(System.currentTimeMillis() - intakebucketClock < 2000) {
+        if(System.currentTimeMillis() - intakebucketClock < 2000 && i == 0) {
             if(intakeBucketState == IntakeBucket.RIGHT) {
                 i = -0.5;
             }
@@ -371,7 +376,7 @@ public class Robot {
             intake2.setPower(i);
         }*/
 
-        if(System.currentTimeMillis() - intakebucketClock < 750) {
+        if(System.currentTimeMillis() - intakebucketClock < 2000 && i == 0) {
             if(intakeBucketState == IntakeBucket.LEFT) {
                 i = -0.5;
             }
