@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.openCV.SkystoneDeterminationExample;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -63,13 +64,14 @@ public class DuckAuto extends LinearOpMode {
         robot.encoderservo.setPosition(0.25);
 
         //start to carousel
-        Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
+        TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,-64,0))
                 .lineTo(new Vector2d(-42.5, -54))
+                .waitSeconds(0.5)
                 .lineTo(new Vector2d(-61.5, -54))
                 .build();
 
         //carousel to hub
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+        Trajectory traj2 = drive.trajectoryBuilder(seq1.end())
                 .splineTo(new Vector2d(-43.5, -21), 90)
                 .build();
 
@@ -107,10 +109,11 @@ public class DuckAuto extends LinearOpMode {
             robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
 
             //drive to carousel
-            drive.followTrajectory(traj1);
+            drive.followTrajectorySequence(seq1);
             while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
                 drive.update();
-                robot.setCarSpeed(-0.43);
+                robot.setCarSpeed(-0.6);
+
             //    robot.updateExtend();
             //    robot.updateLiftServo();
             //    robot.updateIntakeBucket();
@@ -129,7 +132,8 @@ public class DuckAuto extends LinearOpMode {
                     drive.update();
                     robot.updateExtend();
                     robot.updateLiftServo();
-                    robot.updateIntakeBucket();robot.setIntake1Speed(1);
+                    robot.updateIntakeBucket();
+                    robot.setIntake1Speed(1);
                 }
 
                 //turn off intake and raise intake bucket
