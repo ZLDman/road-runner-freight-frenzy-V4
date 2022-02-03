@@ -30,6 +30,8 @@ public class DriverControled extends LinearOpMode {
 
         boolean erik = false;
 
+        Robot.driver2 driver2Mode = Robot.driver2.other;
+
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
@@ -72,10 +74,12 @@ public class DriverControled extends LinearOpMode {
 
 
             if(gamepad2.x){
-                robot.intakeState = Robot.IntakeState.INTAKE;
+                robot.setLevel(0);
+                robot.extendState = Robot.ExtendState.EXTEND;
             }
 
             if(gamepad2.y){
+                robot.setLevel(3);
                 robot.extendState = Robot.ExtendState.EXTEND;
             }
 
@@ -115,19 +119,30 @@ public class DriverControled extends LinearOpMode {
             //robot.updateIntake();
             robot.updateExtend();
 
-            robot.tapelift += -gamepad2.left_stick_y * 0.01;
-
-            robot.tapelift = Math.max(0.43, robot.tapelift);
-            robot.tapelift = Math.min(0.66, robot.tapelift);
-
-            robot.tapeextendservo.setPower(gamepad2.right_stick_y);
-            robot.tapeliftservo.setPosition(robot.tapelift);
-
-            if(gamepad2.right_stick_x > 0) {
-                robot.taperotateservo.setPower(gamepad2.right_stick_x / 10);
+            if(gamepad2.a){
+                driver2Mode = Robot.driver2.other;
             }
-            else{
-                robot.taperotateservo.setPower(gamepad2.right_stick_x / 20);
+            else if(gamepad2.b){
+                driver2Mode = Robot.driver2.tape;
+            }
+
+            if(driver2Mode == Robot.driver2.tape) {
+                Robot.tapelift += -gamepad2.left_stick_y * 0.01;
+
+                Robot.tapelift = Math.max(0.43, Robot.tapelift);
+                Robot.tapelift = Math.min(0.66, Robot.tapelift);
+
+                robot.tapeextendservo.setPower(gamepad2.right_stick_y);
+                robot.tapeliftservo.setPosition(Robot.tapelift);
+
+                if (gamepad2.right_stick_x > 0) {
+                    robot.taperotateservo.setPower(gamepad2.right_stick_x / 10);
+                } else {
+                    robot.taperotateservo.setPower(gamepad2.right_stick_x / 20);
+                }
+            }
+            else {
+                robot.sharedExtend = (-gamepad2.left_stick_y * 400) + 600;
             }
 
             //robot.encoderservo.setPosition(0.25);

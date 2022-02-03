@@ -40,6 +40,7 @@ public class Robot {
     public static double tapelift = 0.55;
     public double liftPosition = 0.4;
 
+    public double sharedExtend = 700;
 
     public static double carMaxSpeed = 0.43;
 
@@ -79,6 +80,11 @@ public class Robot {
         RIGHT,      //right
     }
 
+    enum driver2 {
+        tape,       //left
+        other,     //up
+    }
+
     public IntakeState intakeState = IntakeState.MANUAL;
     public ExtendState extendState = ExtendState.INIT;
     public IntakeBucket intakeBucketState = IntakeBucket.UP;
@@ -86,6 +92,7 @@ public class Robot {
 
     public long intakeClock = System.currentTimeMillis();
     public long extendClock = System.currentTimeMillis();
+    public long extendClock2 = System.currentTimeMillis();
     public long intakebucketClock = System.currentTimeMillis();
 
     public int intake1Target = 0;
@@ -217,15 +224,28 @@ public class Robot {
             //reset
             case RESET:{
 
-                if(extend.getCurrentPosition() > 500){
+                if(extend.getCurrentPosition() > 125){
                     extend.setTargetPosition(0);
                     extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     extend.setPower(1);
                 }
 
-                if(extend.getCurrentPosition() < 1700){
-                    bucket.setPosition(0);
-                    setLiftPosition(0.04);
+                if(level > 0) {
+                    if (extend.getCurrentPosition() < 1700) {
+                        bucket.setPosition(0);
+                        setLiftPosition(0.04);
+                    }
+                }
+                else{
+                    if (extend.getCurrentPosition() < 100) {
+                        if(System.currentTimeMillis() - extendClock2 > 1500) {
+                            bucket.setPosition(0);
+                            extendClock2 = System.currentTimeMillis();
+                        }
+
+                        if(System.currentTimeMillis() - extendClock2 > 500)
+                            setLiftPosition(0.04);
+                    }
                 }
 
                 if(!extend.isBusy()){
@@ -233,6 +253,7 @@ public class Robot {
                     extend.setPower(0);
                 }
 
+                extendClock = System.currentTimeMillis();
                 break;
             }
             //extend + lift bucket
@@ -246,7 +267,23 @@ public class Robot {
                 }
 
 
-                if (level == 1)
+                //shared
+                if (level == 0)
+                {
+                    if(System.currentTimeMillis() - extendClock > 500) {
+                        extend.setTargetPosition((int)sharedExtend);
+
+                        extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        extend.setPower(1);
+
+                        extendClock = System.currentTimeMillis();
+                        extendState = ExtendState.DUMP;
+                    }
+
+                    setLiftPosition(0.35);
+                }
+
+                else if (level == 1)
                 {
                     extend.setTargetPosition(2200);
                     setLiftPosition(0.22);
@@ -262,11 +299,13 @@ public class Robot {
                     setLiftPosition(0.73);
                 }
 
-                extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                extend.setPower(1);
+                if(level != 0) {
+                    extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    extend.setPower(1);
 
-                extendClock = System.currentTimeMillis();
-                extendState = ExtendState.DUMP;
+                    extendClock = System.currentTimeMillis();
+                    extendState = ExtendState.DUMP;
+                }
 
                 break;
             }
@@ -280,6 +319,10 @@ public class Robot {
                 }
 
                 if(System.currentTimeMillis() - extendClock > 500 && !extend.isBusy()) {
+                    if (level == 0)
+                    {
+                        bucket.setPosition(0.85 + bucketOffset1);
+                    }
                     if (level == 1)
                     {
                         bucket.setPosition(0.6 + bucketOffset1);

@@ -38,7 +38,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
         long autoTime = System.currentTimeMillis();
 
-        drive.setPoseEstimate(new Pose2d(-42.5,-64,0));
+        drive.setPoseEstimate(new Pose2d(-5,-64,0));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -71,6 +71,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
         robot.encoderservo.setPosition(0.25);
 
         //start to hub
+        /*
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
                 .splineTo(new Vector2d(-12, -64), 0)
                 .build();
@@ -84,6 +85,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
         Trajectory traj3 = drive.trajectoryBuilder(traj2.end(),true)
                 .splineTo(new Vector2d(-12, -64), 0)
                 .build();
+         */
 
 
         while (!isStarted())
@@ -119,13 +121,13 @@ public class AutoNoRoadrunner extends LinearOpMode {
             robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
 
             //drive to hub
-            drive.setDrivePower(new Pose2d(0.5,0,0));
+            drive.setDrivePower(new Pose2d(-0.5,0,0));
             while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
-                drive.update();
+                drive.updatePoseEstimate();
                 robot.updateExtend();
                 robot.updateLiftServo();
                 robot.updateIntakeBucket();
-                if(drive.getPoseEstimate().getX() > -20){
+                if(drive.getPoseEstimate().getX() < -15){
                     drive.setDrivePower(new Pose2d(0,0,0));
                 }
             }
@@ -136,23 +138,16 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 robot.setIntake1Speed(1);
 
                 //drive into warehouse
-                drive.setDrivePower(new Pose2d(0.5,0,0));
-                while (robot.getColor(-1, 1) > 1 && drive.getPoseEstimate().getX() < 39 && opModeIsActive()) {
-                    drive.update();
+                drive.setDrivePower(new Pose2d(0.75,0,0));
+                while (robot.getColor(-1, 1) > 2 && opModeIsActive()) {
+                    drive.updatePoseEstimate();
                     robot.updateExtend();
                     robot.updateLiftServo();
                     robot.updateIntakeBucket();
                     robot.setIntake1Speed(1);
-                }
-
-                //intake
-                while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
-                    drive.setDrivePower(new Pose2d(0.3,0,0));
-                    drive.update();
-                    robot.updateExtend();
-                    robot.updateLiftServo();
-                    robot.updateIntakeBucket();
-                    robot.setIntake1Speed(1);
+                    if(drive.getPoseEstimate().getX() > 0){
+                        drive.setDrivePower(new Pose2d(0.3,0,0));
+                    }
                 }
 
                 drive.setDrivePower(new Pose2d(0,0,0));
@@ -163,10 +158,14 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 robot.setIntake1Speed(0);
                 robot.setIntakeBucketState(Robot.IntakeBucket.UP);
 
+                //if(System.currentTimeMillis() - autoTime < 9000){
+                //    return;
+                //}
+
                 //drive to hub
-                drive.setDrivePower(new Pose2d(-0.5,0,0));
+                drive.setDrivePower(new Pose2d(-0.75,0,0));
                 while (drive.getPoseEstimate().getX() > -9 && opModeIsActive()) {
-                    drive.update();
+                    drive.updatePoseEstimate();
                     robot.updateExtend();
                     robot.updateLiftServo();
                     robot.updateIntakeBucket();
@@ -186,10 +185,6 @@ public class AutoNoRoadrunner extends LinearOpMode {
                     robot.updateExtend();
                     robot.updateLiftServo();
                     robot.setIntake1Speed(0);
-                }
-
-                if(System.currentTimeMillis() - autoTime < 9000){
-                    return;
                 }
             }
         }

@@ -8,7 +8,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class ZachPathGenerator {
 
-    private double endX;
+    private double endX = 0;
 
     public ZachPathGenerator( double end) {
         this.endX = end;

@@ -16,7 +16,7 @@ public class ZachPathFollower {
     double maxVelocity;
 
     //distance to start slowing down
-    double accelerationDistance;
+    double accelerationDistance = 10;
 
     //current path
     ZachPathGenerator currentPath;
@@ -41,6 +41,7 @@ public class ZachPathFollower {
 
     //follows path
     public void FollowPathAsync(ZachPathGenerator path){
+        currentPath = path;
         currentState = State.Following;
     }
 
