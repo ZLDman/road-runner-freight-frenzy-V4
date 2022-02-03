@@ -81,20 +81,21 @@ public class DuckAuto extends LinearOpMode
         //carousel to hub
         TrajectorySequence seq2 = drive.trajectorySequenceBuilder(seq1.end())
                 .lineTo(new Vector2d(-55, -48))
+                .waitSeconds(0.2)
                 .turn(Math.toRadians(-90))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-68, -48))
+                .lineTo(new Vector2d(-74, -48))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-68, -36))
+                .lineTo(new Vector2d(-74, -36))
                 .waitSeconds(0.2)
                 .lineTo(new Vector2d(-54, -36))
                 .build();
 
         //hub to parking
         TrajectorySequence seq3 = drive.trajectorySequenceBuilder(seq2.end())
-                .lineTo(new Vector2d(-72, -36))
+                .lineTo(new Vector2d(-76, -33))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-72, -50))
+                .lineTo(new Vector2d(-76, -50))
                 .build();
 
 
