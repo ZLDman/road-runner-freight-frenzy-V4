@@ -14,6 +14,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
+import java.util.Vector;
+
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
  * teleop routine and make sure the robot's estimated pose matches the robot's actual pose (slight
@@ -22,12 +24,16 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @Autonomous()
-public class DuckAuto extends LinearOpMode {
+public class DuckAuto extends LinearOpMode
+{
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationExample.SkystoneDeterminationPipeline pipeline;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
+        double retractTimer;
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
@@ -65,26 +71,37 @@ public class DuckAuto extends LinearOpMode {
 
         //start to carousel
         TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,-64,0))
-                .lineTo(new Vector2d(-42.5, -54))
-                .waitSeconds(0.5)
+                .lineTo(new Vector2d(-42.5, -48))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-61.5, -48))
+                .waitSeconds(0.2)
                 .lineTo(new Vector2d(-61.5, -54))
                 .build();
 
         //carousel to hub
-        Trajectory traj2 = drive.trajectoryBuilder(seq1.end())
-                .splineTo(new Vector2d(-43.5, -21), 90)
+        TrajectorySequence seq2 = drive.trajectorySequenceBuilder(seq1.end())
+                .lineTo(new Vector2d(-55, -48))
+                .turn(Math.toRadians(-90))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-68, -48))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-68, -36))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-54, -36))
                 .build();
 
         //hub to parking
-        Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
-                .splineTo(new Vector2d(-12, -60), 0)
+        TrajectorySequence seq3 = drive.trajectorySequenceBuilder(seq2.end())
+                .lineTo(new Vector2d(-72, -36))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-72, -50))
                 .build();
 
 
 
         int level = pipeline.getAnalysis().ordinal() + 1;
 
-        while (!isStarted() && opModeIsActive())
+        while (!isStarted())
         {
 
             telemetry.addData("Analysis", pipeline.getAnalysis());
@@ -97,7 +114,8 @@ public class DuckAuto extends LinearOpMode {
 
         phoneCam.stopStreaming();
 
-        if (opModeIsActive()) {
+        if (opModeIsActive())
+        {
 
             robot.setLevel(level);
 
@@ -110,16 +128,36 @@ public class DuckAuto extends LinearOpMode {
 
             //drive to carousel
             drive.followTrajectorySequence(seq1);
-            while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
-                drive.update();
-                robot.setCarSpeed(-0.6);
 
-            //    robot.updateExtend();
-            //    robot.updateLiftServo();
-            //    robot.updateIntakeBucket();
+            drive.update();
+            robot.setCarSpeed(-1);
+            sleep(2000);
+            robot.setCarSpeed(0);
+
+            //Turn so back is pressed against wall + drive to hub
+            drive.followTrajectorySequence(seq2);
+
+            //extend arm + deliver freight
+            while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET)
+            {
+                robot.updateExtend();
+                robot.updateLiftServo();
+                robot.updateIntakeBucket();
             }
 
-            while(opModeIsActive()) {
+
+            //park + retract ar
+            drive.followTrajectorySequenceAsync(seq3);
+
+            retractTimer = getRuntime();
+            while (opModeIsActive() && (getRuntime()-retractTimer < 5))
+            {
+                drive.update();
+                robot.updateExtend();
+                robot.updateLiftServo();
+            }
+
+            /*while(opModeIsActive()) {
 
                 //put encoder servo down
                 robot.encoderservo.setPosition(0.25);
@@ -163,7 +201,7 @@ public class DuckAuto extends LinearOpMode {
                     robot.updateLiftServo();
                     robot.setIntake1Speed(0);
                 }
-            }
+            }*/
         }
     }
 }
