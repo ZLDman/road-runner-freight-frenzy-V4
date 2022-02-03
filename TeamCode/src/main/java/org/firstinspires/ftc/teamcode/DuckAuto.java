@@ -156,52 +156,6 @@ public class DuckAuto extends LinearOpMode
                 robot.updateExtend();
                 robot.updateLiftServo();
             }
-
-            /*while(opModeIsActive()) {
-
-                //put encoder servo down
-                robot.encoderservo.setPosition(0.25);
-
-                robot.setIntake1Speed(1);
-
-                //drive into warehouse
-                drive.followTrajectoryAsync(traj2);
-                while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
-                    drive.update();
-                    robot.updateExtend();
-                    robot.updateLiftServo();
-                    robot.updateIntakeBucket();
-                    robot.setIntake1Speed(1);
-                }
-
-                //turn off intake and raise intake bucket
-                robot.setIntake1Speed(0);
-                robot.setIntakeBucketState(Robot.IntakeBucket.UP);
-
-                //drive to hub
-                drive.followTrajectoryAsync(traj3);
-                while (drive.isBusy() && opModeIsActive()) {
-                    drive.update();
-                    robot.updateExtend();
-                    robot.updateLiftServo();
-                    robot.updateIntakeBucket();
-                    robot.setIntake1Speed(0);
-                }
-
-                //set target to high goal and extend
-                robot.setLevel(3);
-                robot.extendState = Robot.ExtendState.EXTEND;
-
-                //intake down
-                robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
-
-                //wait until we finished dumping
-                while (robot.extendState != Robot.ExtendState.RESET && opModeIsActive()) {
-                    robot.updateExtend();
-                    robot.updateLiftServo();
-                    robot.setIntake1Speed(0);
-                }
-            }*/
         }
     }
 }
