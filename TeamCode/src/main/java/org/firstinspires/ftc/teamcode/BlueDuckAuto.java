@@ -24,7 +24,7 @@ import java.util.Vector;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @Autonomous()
-public class DuckAuto extends LinearOpMode
+public class BlueDuckAuto extends LinearOpMode
 {
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationExample.SkystoneDeterminationPipeline pipeline;
@@ -37,7 +37,7 @@ public class DuckAuto extends LinearOpMode
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Robot robot = new Robot(hardwareMap);
 
-        drive.setPoseEstimate(new Pose2d(-42.5,-64,0));
+        drive.setPoseEstimate(new Pose2d(-42.5,64,0));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -70,32 +70,32 @@ public class DuckAuto extends LinearOpMode
         robot.encoderservo.setPosition(0.25);
 
         //start to carousel
-        TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,-64,0))
-                .lineTo(new Vector2d(-42.5, -48))
+        TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,64,0))
+                .lineTo(new Vector2d(-42.5, 48))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-61.5, -48))
+                .turn(Math.toRadians(90))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-61.5, -54))
+                .lineTo(new Vector2d(-61.5, 48))
+                .waitSeconds(0.2)
+                .lineTo(new Vector2d(-61.5, 54))
                 .build();
 
         //carousel to hub
         TrajectorySequence seq2 = drive.trajectorySequenceBuilder(seq1.end())
-                .lineTo(new Vector2d(-55, -48))
+                .lineTo(new Vector2d(-55, 48))
                 .waitSeconds(0.2)
-                .turn(Math.toRadians(-90))
+                .lineTo(new Vector2d(-74, 48))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-74, -48))
+                .lineTo(new Vector2d(-74, 36))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-74, -36))
-                .waitSeconds(0.2)
-                .lineTo(new Vector2d(-54, -36))
+                .lineTo(new Vector2d(-54, 36))
                 .build();
 
         //hub to parking
         TrajectorySequence seq3 = drive.trajectorySequenceBuilder(seq2.end())
-                .lineTo(new Vector2d(-76, -33))
+                .lineTo(new Vector2d(-76, 33))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-76, -50))
+                .lineTo(new Vector2d(-76, 48))
                 .build();
 
 
@@ -131,7 +131,7 @@ public class DuckAuto extends LinearOpMode
             drive.followTrajectorySequence(seq1);
 
             drive.update();
-            robot.setCarSpeed(-1);
+            robot.setCarSpeed(1);
             sleep(2000);
             robot.setCarSpeed(0);
 
@@ -160,3 +160,4 @@ public class DuckAuto extends LinearOpMode
         }
     }
 }
+

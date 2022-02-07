@@ -202,7 +202,7 @@ public class Robot {
             }
         }
         else if(intakeBucketState == IntakeBucket.RIGHT){
-            intake.setPosition(0.15);
+            intake.setPosition(0.13);
         }
         else if(intakeBucketState == IntakeBucket.LEFT) {
             intake.setPosition(0.77);

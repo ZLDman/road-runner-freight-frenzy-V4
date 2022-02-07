@@ -158,9 +158,18 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 robot.setIntake1Speed(0);
                 robot.setIntakeBucketState(Robot.IntakeBucket.UP);
 
-                //if(System.currentTimeMillis() - autoTime < 9000){
-                //    return;
-                //}
+                telemetry.addData("Time: ", System.currentTimeMillis() - autoTime);
+                telemetry.update();
+
+                if(System.currentTimeMillis() - autoTime > 25000){
+                    while(true)
+                    {
+                        telemetry.addData("Time: ", System.currentTimeMillis() - autoTime);
+                        telemetry.addData("","Stopped");
+                        telemetry.update();
+                    }
+
+                }
 
                 //drive to hub
                 drive.setDrivePower(new Pose2d(-0.75,0,0));
