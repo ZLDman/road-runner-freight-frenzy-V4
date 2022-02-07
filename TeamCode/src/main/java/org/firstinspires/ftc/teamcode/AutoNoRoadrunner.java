@@ -162,7 +162,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 telemetry.update();
 
                 if(System.currentTimeMillis() - autoTime > 25000){
-                    while(true)
+                    while(opModeIsActive())
                     {
                         telemetry.addData("Time: ", System.currentTimeMillis() - autoTime);
                         telemetry.addData("","Stopped");
