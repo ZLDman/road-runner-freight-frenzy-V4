@@ -58,6 +58,9 @@ public class Robot {
     public ColorSensor sensorColor1;
     public DistanceSensor sensorDistance1;
 
+    public ColorSensor sensorColor2;
+    public DistanceSensor sensorDistance2;
+
     public IntakeBucket getIntakeBucketState() {
         return intakeBucketState;
     }
@@ -135,6 +138,12 @@ public class Robot {
         // get a reference to the distance sensor that shares the same name.
         sensorDistance1 = hardwareMap.get(DistanceSensor .class, "color1");
 
+        // get a reference to the color sensor.
+        sensorColor2 = hardwareMap.get(ColorSensor .class, "color2");
+
+        // get a reference to the distance sensor that shares the same name.
+        sensorDistance2 = hardwareMap.get(DistanceSensor .class, "color2");
+
     }
 
     public void updateIntake(){
@@ -143,7 +152,7 @@ public class Robot {
                 setIntake1Speed(1);
 
                 //if we sense something
-                if(getColor(-1,1) < 1){
+                if(getColor(1) < 1){
                     //raise intake scoop
                     intakeState = IntakeState.LIFT;
                     intakeClock = System.currentTimeMillis();
@@ -327,39 +336,20 @@ public class Robot {
 
                 levelBucket();
 
-                if(autoDump) {
-                    if (System.currentTimeMillis() - extendClock > 400 && !extend.isBusy()) {
-                        if (level == 0) {
-                            bucket.setPosition(0.85 + bucketOffset1);
-                        }
-                        if (level == 1) {
-                            bucket.setPosition(0.6 + bucketOffset1);
-                        } else if (level == 2) {
-                            bucket.setPosition(0.75 + bucketOffset1);
-                        } else {
-                            bucket.setPosition(0.93 + bucketOffset1);
-                        }
-
-                        extendClock = System.currentTimeMillis();
-                        extendState = ExtendState.WAIT;
+                if (System.currentTimeMillis() - extendClock > 400 && !extend.isBusy()) {
+                    if (level == 0) {
+                        bucket.setPosition(0.85 + bucketOffset1);
                     }
-                }
-                else{
-                    if (!extend.isBusy()) {
-                        if (level == 0) {
-                            bucket.setPosition(0.85 + bucketOffset1);
-                        }
-                        if (level == 1) {
-                            bucket.setPosition(0.6 + bucketOffset1);
-                        } else if (level == 2) {
-                            bucket.setPosition(0.75 + bucketOffset1);
-                        } else {
-                            bucket.setPosition(0.93 + bucketOffset1);
-                        }
-
-                        extendClock = System.currentTimeMillis();
-                        extendState = ExtendState.WAIT;
+                    if (level == 1) {
+                        bucket.setPosition(0.6 + bucketOffset1);
+                    } else if (level == 2) {
+                        bucket.setPosition(0.75 + bucketOffset1);
+                    } else {
+                        bucket.setPosition(0.93 + bucketOffset1);
                     }
+
+                    extendClock = System.currentTimeMillis();
+                    extendState = ExtendState.WAIT;
                 }
 
                 break;
@@ -464,9 +454,11 @@ public class Robot {
     public void setIntakeSpeed(double speed,int side){
         if(side == 1){
             setIntake1Speed(speed);
+            setIntake2Speed(0);
         }
         else if(side == -1){
             setIntake2Speed(speed);
+            setIntake1Speed(0);
         }
     }
 
@@ -514,9 +506,10 @@ public class Robot {
 
 
     // get the color sensor values
-    double getColor(int channel,int s) {
-
-        return sensorDistance1.getDistance(DistanceUnit.INCH);
-
+    double getColor(int s) {
+        if(s == 1) {
+            return sensorDistance1.getDistance(DistanceUnit.INCH);
+        }
+        return sensorDistance2.getDistance(DistanceUnit.INCH);
     }
 }

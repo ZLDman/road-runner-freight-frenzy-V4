@@ -82,12 +82,12 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
             telemetry.addData("Analysis", pipeline.getAnalysis());
             if(side == 1) {
-                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>●</font><big>", 255, 0, 0))
-                        .addData("side:", "red");
+                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>red</font><big>", 255, 0, 0));
+                        //.addData("side", " red");
             }
             else {
-                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>●</font><big>", 0, 0, 255))
-                        .addData("side:", "blue");
+                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>blue</font><big>", 0, 0, 255));
+                        //.addData("side", " blue");
             }
 
 
@@ -140,7 +140,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
                 //drive into warehouse
                 drive.setDrivePower(new Pose2d(0.75 * side,0,0));
-                while (robot.getColor(-1, 1) > 2 && opModeIsActive()) {
+                while (robot.getColor(side) > 2 && opModeIsActive()) {
                     drive.updatePoseEstimate();
                     robot.updateExtend();
                     robot.updateLiftServo();
@@ -194,7 +194,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 while (robot.extendState != Robot.ExtendState.RESET && opModeIsActive()) {
                     robot.updateExtend();
                     robot.updateLiftServo();
-                    robot.setIntake1Speed(0);
+                    robot.setIntakeSpeed(0,side);
                 }
             }
         }

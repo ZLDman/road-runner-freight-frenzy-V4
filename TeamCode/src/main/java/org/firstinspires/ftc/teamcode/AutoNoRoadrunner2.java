@@ -122,13 +122,13 @@ public class AutoNoRoadrunner2 extends LinearOpMode {
                     robot.updateLiftServo();
                     robot.updateIntakeBucket();
                     robot.setIntake1Speed(1);
-                    if(robot.getColor(-1, 1) > 1){
+                    if(robot.getColor(1) > 1){
                         pathFollower.cancleFollowing();
                     }
                 }
 
                 //intake
-                while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
+                while (robot.getColor(1) > 1 && opModeIsActive()) {
                     drive.setDrivePower(new Pose2d(0.3,0,0));
                     drive.update();
                     robot.updateExtend();

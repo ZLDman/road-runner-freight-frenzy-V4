@@ -133,7 +133,7 @@ public class Auto extends LinearOpMode {
 
                 //drive into warehouse
                 drive.followTrajectoryAsync(traj2);
-                while (robot.getColor(-1, 1) > 1 && opModeIsActive()) {
+                while (robot.getColor(1) > 1 && opModeIsActive()) {
                     drive.setDrivePower(new Pose2d(0.2,0,0));
                     drive.update();
                     robot.updateExtend();

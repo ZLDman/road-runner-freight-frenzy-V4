@@ -70,12 +70,12 @@ public class BlueDuckAuto extends LinearOpMode
         robot.encoderservo.setPosition(0.25);
 
         //start to carousel
-        TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,64,0))
-                .lineTo(new Vector2d(-42.5, 48))
+        TrajectorySequence seq1 = drive.trajectorySequenceBuilder(new Pose2d(-42.5,64,180))
+                .lineTo(new Vector2d(-42.5, 40))
                 .waitSeconds(0.2)
                 .turn(Math.toRadians(90))
                 .waitSeconds(0.2)
-                .lineTo(new Vector2d(-61.5, 48))
+                .lineTo(new Vector2d(-61.5, 40))
                 .waitSeconds(0.2)
                 .lineTo(new Vector2d(-61.5, 54))
                 .build();

@@ -131,7 +131,7 @@ public class DriverControled extends LinearOpMode {
                 //stop if we are up
                 else{
                     robot.setIntake1Speed(0);
-                    robot.setIntake1Speed(1);
+                    robot.setIntake2Speed(0);
                 }
             }
 
@@ -282,7 +282,9 @@ public class DriverControled extends LinearOpMode {
 
 
             //color sensor
-            //telemetry.addData("distance ", robot.getColor(-1,1));
+            telemetry.addData("intake s ", robot.intakeBucketState);
+            telemetry.addData("intake last s ", robot.intakeBucketlastState);
+            telemetry.addData("intake clock ", System.currentTimeMillis() - robot.intakebucketClock);
             //telemetry.addData("alpha ", robot.getColor(0,1));
             //telemetry.addData("red ", robot.getColor(1,1));
             //telemetry.addData("green ", robot.getColor(2,1));
