@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.openCV.SkystoneDeterminationExample;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -38,7 +39,8 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
         long autoTime = System.currentTimeMillis();
 
-        drive.setPoseEstimate(new Pose2d(-5,-64,0));
+        //red / blue side
+        int side = 1;
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -70,28 +72,25 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
         robot.encoderservo.setPosition(0.25);
 
-        //start to hub
-        /*
-        Trajectory traj1 = drive.trajectoryBuilder(new Pose2d(-42.5,-64,0))
-                .splineTo(new Vector2d(-12, -64), 0)
-                .build();
-
-        //hub to warehouse
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .splineTo(new Vector2d(42, -64), 0)
-                .build();
-
-        //warehouse to hub
-        Trajectory traj3 = drive.trajectoryBuilder(traj2.end(),true)
-                .splineTo(new Vector2d(-12, -64), 0)
-                .build();
-         */
-
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
         while (!isStarted())
         {
 
+            if(gamepad1.x) side = -1;
+            if(gamepad1.b) side = 1;
+
             telemetry.addData("Analysis", pipeline.getAnalysis());
+            if(side == 1) {
+                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>●</font><big>", 255, 0, 0))
+                        .addData("side:", "red");
+            }
+            else {
+                telemetry.addLine(String.format("<big><font color=#%02x%02x%02x>●</font><big>", 0, 0, 255))
+                        .addData("side:", "blue");
+            }
+
+
             telemetry.update();
 
             // Don't burn CPU cycles busy-looping in this sample
@@ -101,6 +100,8 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
 
         if (opModeIsActive()) {
+
+            drive.setPoseEstimate(new Pose2d(side == 1 ? -5 /*red*/ : 0 /*blue*/,-64,side == 1 ? 0 /*red*/ : 180 /*blue*/));
 
             autoTime = System.currentTimeMillis();
 
@@ -118,10 +119,10 @@ public class AutoNoRoadrunner extends LinearOpMode {
             robot.extendState = Robot.ExtendState.EXTEND;
 
             //intake down
-            robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
+            robot.setIntakeBucketState(side == 1 ? Robot.IntakeBucket.RIGHT /*red*/ : Robot.IntakeBucket.LEFT /*blue*/);
 
             //drive to hub
-            drive.setDrivePower(new Pose2d(-0.5,0,0));
+            drive.setDrivePower(new Pose2d(-0.5 * side,0,0));
             while (opModeIsActive() && robot.extendState != Robot.ExtendState.RESET) {
                 drive.updatePoseEstimate();
                 robot.updateExtend();
@@ -135,10 +136,10 @@ public class AutoNoRoadrunner extends LinearOpMode {
 
             while(opModeIsActive()) {
 
-                robot.setIntake1Speed(1);
+                robot.setIntakeSpeed(1,side);
 
                 //drive into warehouse
-                drive.setDrivePower(new Pose2d(0.75,0,0));
+                drive.setDrivePower(new Pose2d(0.75 * side,0,0));
                 while (robot.getColor(-1, 1) > 2 && opModeIsActive()) {
                     drive.updatePoseEstimate();
                     robot.updateExtend();
@@ -146,16 +147,16 @@ public class AutoNoRoadrunner extends LinearOpMode {
                     robot.updateIntakeBucket();
                     robot.setIntake1Speed(1);
                     if(drive.getPoseEstimate().getX() > 0){
-                        drive.setDrivePower(new Pose2d(0.3,0,0));
+                        drive.setDrivePower(new Pose2d(0.3 * side,0,0));
                     }
                 }
 
                 drive.setDrivePower(new Pose2d(0,0,0));
 
                 //turn off intake and raise intake bucket
-                robot.setIntake1Speed(-1);
+                robot.setIntakeSpeed(-1,side);
                 sleep(100);
-                robot.setIntake1Speed(0);
+                robot.setIntakeSpeed(0,side);
                 robot.setIntakeBucketState(Robot.IntakeBucket.UP);
 
                 telemetry.addData("Time: ", System.currentTimeMillis() - autoTime);
@@ -172,7 +173,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 }
 
                 //drive to hub
-                drive.setDrivePower(new Pose2d(-0.75,0,0));
+                drive.setDrivePower(new Pose2d(-0.75 * side,0,0));
                 while (drive.getPoseEstimate().getX() > -9 && opModeIsActive()) {
                     drive.updatePoseEstimate();
                     robot.updateExtend();
@@ -187,7 +188,7 @@ public class AutoNoRoadrunner extends LinearOpMode {
                 robot.extendState = Robot.ExtendState.EXTEND;
 
                 //intake down
-                robot.setIntakeBucketState(Robot.IntakeBucket.RIGHT);
+                robot.setIntakeBucketState(side == 1 ? Robot.IntakeBucket.RIGHT /*red*/ : Robot.IntakeBucket.LEFT /*blue*/);
 
                 //wait until we finished dumping
                 while (robot.extendState != Robot.ExtendState.RESET && opModeIsActive()) {

@@ -29,6 +29,7 @@ public class DriverControled extends LinearOpMode {
         double intakePos = 0.45;
 
         boolean erik = false;
+        boolean dpadDownLast = false;
 
         Robot.driver2 driver2Mode = Robot.driver2.other;
 
@@ -83,6 +84,13 @@ public class DriverControled extends LinearOpMode {
                 robot.extendState = Robot.ExtendState.EXTEND;
             }
 
+            //when to dump
+            robot.autoDump = gamepad2.left_bumper;
+
+            //cancle extend
+            if(gamepad2.left_trigger > 0.5)
+                robot.extendState = Robot.ExtendState.RESET;
+
 
             /* INTAKE BUCKET */
             if(gamepad2.dpad_up){
@@ -94,22 +102,36 @@ public class DriverControled extends LinearOpMode {
             else if(gamepad2.dpad_left){
                 robot.setIntakeBucketState(Robot.IntakeBucket.LEFT);
             }
+
+            boolean d = gamepad2.dpad_down;
+
+            if(d && !dpadDownLast){
+                robot.setIntakeBucketState(robot.intakeBucketlastState);
+            }
+            dpadDownLast = d;
+
             robot.updateIntakeBucket();
 
             /* INTAKE */
             if(robot.intakeState == Robot.IntakeState.MANUAL){
-                if(gamepad2.right_bumper) {
-                    robot.setIntake1Speed(-gamepad2.right_trigger);
+                if(robot.intakeBucketState == Robot.IntakeBucket.RIGHT) {
+                    if (gamepad2.right_bumper) {
+                        robot.setIntake1Speed(-gamepad2.right_trigger);
+                    } else {
+                        robot.setIntake1Speed(gamepad2.right_trigger);
+                    }
                 }
+                else if(robot.intakeBucketState == Robot.IntakeBucket.LEFT) {
+                    if (gamepad2.right_bumper) {
+                        robot.setIntake2Speed(-gamepad2.right_trigger);
+                    } else {
+                        robot.setIntake2Speed(gamepad2.right_trigger);
+                    }
+                }
+                //stop if we are up
                 else{
-                    robot.setIntake1Speed(gamepad2.right_trigger);
-                }
-
-                if(gamepad2.left_bumper) {
-                    robot.setIntake2Speed(-gamepad2.left_trigger);
-                }
-                else{
-                    robot.setIntake2Speed(gamepad2.left_trigger);
+                    robot.setIntake1Speed(0);
+                    robot.setIntake1Speed(1);
                 }
             }
 
