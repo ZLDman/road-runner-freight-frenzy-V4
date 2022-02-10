@@ -125,7 +125,7 @@ public class Robot {
 
         extendStop = hardwareMap.get(DigitalChannel.class,"extendStop");
 
-        extend.setDirection(DcMotorSimple.Direction.REVERSE);
+        extend.setDirection(DcMotorSimple.Direction.FORWARD);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
